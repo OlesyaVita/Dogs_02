@@ -3,7 +3,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 from io import BytesIO
 from tkinter import messagebox as mb
-
+from tkinter import ttk
 
 def get_random_dog_image():
     try:
@@ -14,6 +14,7 @@ def get_random_dog_image():
     except Exception as e:
         mb.showerror("Ошибка", f"Ошибка при запросе к API: {e}")
         return None
+
 
 
 def show_image():
@@ -31,15 +32,24 @@ def show_image():
 
         except requests.RequestException as e:
             mb.showerror("Ошибка", f"Не удалось загрузить изображение: {e}")
+    progress.stop()
 
+def prog():
+    progress["value"] = 0
+    progress.start(30)
+    window.after(3000, show_image)
 
 window = Tk()
 window.title("Картинки с собачками")
 window.geometry("360x420")
 
-label = Label()
+label = ttk.Label()
 label.pack(padx=10, pady=10)
 
-button = Button(text="Загрузить изображение", command=show_image)
+button = ttk.Button(text="Загрузить изображение", command=prog)
 button.pack(padx=10, pady=10)
+
+progress = ttk.Progressbar(mode="determinate", length=300)
+progress.pack(pady=10)
+
 window.mainloop()
