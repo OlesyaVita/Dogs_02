@@ -1,5 +1,5 @@
 import requests
-from tkinter import Tk, Toplevel, messagebox
+from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
 from io import BytesIO
@@ -12,7 +12,7 @@ def get_random_dog_image():
         response.raise_for_status()
         data = response.json()
         return data['message']
-    except requests.RequestException as e:
+    except Exception as e:
         mb.showerror("Ошибка", f"Ошибка при запросе к API: {e}")
         return None
 
@@ -28,20 +28,23 @@ def show_image():
             img_size = (int(width_spinbox.get()), int(height_spinbox.get()))
             img.thumbnail(img_size)
             img = ImageTk.PhotoImage(img)
+            # new_window = Toplevel(window)
+            # new_window.title("Случайное изображение пёсика")
+            tab = ttk.Frame(notebook)
+            notebook.add(tab, text=f"Картинка № {notebook.index('end') + 1}")
+            lb= ttk.Label(tab, image=img)
+            lb.pack(padx=10, pady=10)
+            lb.image = img
 
-            new_window = Toplevel(window)
-            new_window.title("Случайное изображение пёсика")
-            label = ttk.Label(new_window, image=img)
-            label.image = img
-            label.pack(padx=10, pady=10)
-
-        except requests.RequestException as e:
+        except Exception as e:
             mb.showerror("Ошибка", f"Не удалось загрузить изображение: {e}")
+
 
 def start_progress():
     progress['value'] = 0
     progress.start(30)
     window.after(3000, lambda: [progress.stop(), show_image()])
+
 
 window = Tk()
 window.title("Случайное изображение")
@@ -54,15 +57,21 @@ progress.pack(padx=10, pady=5)
 
 
 # Ширина
-width_label = ttk.Label(text="Ширина:")
+width_label = ttk.Label(window, text="Ширина:")
 width_label.pack(side='left', padx=(10, 0))
-width_spinbox = ttk.Spinbox(from_=200, to=500, increment=50, width=5)
+width_spinbox = ttk.Spinbox(window, from_=200, to=500, increment=10, width=10)
 width_spinbox.pack(side='left', padx=(0, 10))
 
 # Высота
 height_label = ttk.Label(text="Высота:")
 height_label.pack(side='left', padx=(10, 0))
-height_spinbox = ttk.Spinbox(from_=200, to=500, increment=50, width=5)
-height_spinbox.pack(side='left', padx=(0, 10))
+height_spinbox = ttk.Spinbox(window, from_=200, to=500, increment=10, width=10)
+height_spinbox.pack(side='left', padx=(10, 10))
+
+top_level_window = Toplevel(window)
+top_level_window.title("Изображение собачек")
+
+notebook = ttk.Notebook(top_level_window)
+notebook.pack(expand=True, fill="both", padx=10, pady=10)
 
 window.mainloop()
